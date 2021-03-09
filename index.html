@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="D Finlay">
+    <meta name="description" content="A Movie Suggestion from The Retro Watch-Next Algorithm">
+    <title>You May Also Like &ndash; A Retro Watch-Next Algorithm</title>
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+
+    <!-- JQuery Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- AJAX Librry -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- PureCSS Framework -->
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/pure-min.css"
+        integrity="sha384-LTIDeidl25h2dPxrB2Ekgc9c7sEC3CWGM6HeFmuDNUjX76Ert4Z4IY714dhZHPLd" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/grids-responsive-min.css" />
+    <link rel="stylesheet" href="css/purecssstyles.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/homepage.css">
+
+
+    <script>
+        $(function () {
+
+            console.log("jQuery active");
+
+            getHeroImg();
+
+            hideResultsSection();
+
+            gatherUserInput();
+
+
+
+            // main submit button functionality
+            $("#al-submit-button").click(function () {
+
+
+
+
+                // validate user has made at least one entry
+                var numSearchTerms = processUserInput().length;
+                if (numSearchTerms == 0) {
+                    // error - no choice of search type or search text
+
+                    // bring focus to the first input field
+                    $("#searchField1").focus();
+                    if ($("div.searchAtt1 option:selected").text() == "Choose...") {
+                        $("#searchField1").attr("placeholder", "The algorithm needs a search type!")
+                    } else {
+                        $("#searchField1").attr("placeholder", "The algorithm needs to know the " + $("div.searchAtt1 option:selected").text().toLowerCase());
+                    }
+                    $("#searchField1").css("border", "3px solid #02f7ff");
+                } else {
+                    // cleanup the error formatting (ie. remove the inputbox border and the placeholder message)
+                    $("#searchField1").css("border", "");
+                    // make the results-section visible by removing the display: none property
+                    $("div.pure-u-1.pure-u-md-1-2.pure-u-lg-1-4").css("display", "");
+                    $("div#results-section.pure-u-1").css("display", "");
+
+                    // setup the css "visible" properties for the card
+                    $(".card").css({
+                        "box-shadow": "0 6px 4px 0 rgba(0, 0, 0, 0.5)",
+                        "border": "3px solid #302e2a"
+
+                    });
+
+
+
+
+
+                    // populate the results header
+                    $("#rheader").html("The Retro Algorithm suggests these movies for you...");
+                    $("#rheader").addClass("secondary-color-block");
+                    $("#rheader").css("padding", "1.5rem");
+
+                    $.ajax({
+                        // for now, simply the actual JSON of all movies for testing
+                        // for testing this will represent a results file returned from a database?
+                        url: "IMDBCutDown.json", success: function (result) {
+
+                            // a movie results array holding the ids of the returned results to be held in local storage
+                            var returnedMovieIDs = [];
+
+                            for (var count = 1; count < 5; count++) {
+
+                                // setting random positions in the JSON list
+                                var randPos = Math.floor(Math.random() * result.length);
+                                console.log("Random movie position " + randPos);
+
+                                // create an object, populate, add to the returnedMovieIDs array (for adding post-loop into local storage)
+                                var returnedMovie = {};
+                                returnedMovie.movieID = result[randPos].imdb_title_id;
+                                returnedMovie.selected = "n";
+                                returnedMovieIDs.push(returnedMovie);
+
+                                //populate the fields in the results-section div
+                                grabImages(randPos, result, count);
+                                $("#mname" + count).html("<h3 class='linkinmain'>Title: " + result[randPos].original_title + "</h3>");
+                                $("#mgenre" + count).html("<p><em>Genre:</em> " + result[randPos].genre + "</p>");
+                                $("#mdirector" + count).html("<p><em>Director:</em> " + result[randPos].director + "</p>");
+                                $("#myear" + count).html("<p><em>Year:</em> " + result[randPos].year + "</p>");
+                                $("#mcast" + count).html("<p><em>Cast:</em> " + result[randPos].actors + "</p>");
+                                var meta = (result[randPos].avg_vote) * 10;
+                                $("#mmetas" + count).html("<p><em>Score:</em> " + meta + "%</p>");
+                                $("#mdescription" + count).html("<p><em>Story:</em> " + result[randPos].description + "</p>");
+                            }
+
+                            // add the returnedMovieIDs array to local storage
+                            localStorage.setItem("returnedMovieIDs", JSON.stringify(returnedMovieIDs));
+                        }
+                    });
+
+                    // add spacing for the cards
+                    $(".cardSpacer").css("min-height", "30px");
+
+                    // add bottom margin to the cards
+                    $(".rsection").css("margin-bottom", "70px");
+
+                }
+            });
+
+
+
+
+
+            function grabImages(randPos, result, count) {
+                // uses the IMDB API
+
+                // setup the API call
+                var apiKey = "k_ve6zp8wd";
+                var imdbID = result[randPos].imdb_title_id
+                var imdbJSON = "https://imdb-api.com/API/Images/" + apiKey + "/" + imdbID;
+
+                // collect the first image from the returned JSON
+                $.ajax({
+                    url: imdbJSON, success: function (imdbINFO) {
+                        // declare the image element to change
+                        var imgElement = "#mimg" + count;
+                        // declare the image source to take the first image on the returned object 
+                        // (the api returns 1..many per object so it may not be the expected movie image!)
+                        var imgSrc = imdbINFO.items[0].image;
+                        // set the src attribute on each img element 
+                        $(imgElement).attr("src", imgSrc);
+                    }
+                });
+
+                // add some css spacing
+                $(".resImg").css("margin-top", "5%");
+            }
+
+
+
+
+
+            function getHeroImg() {
+                $.getJSON("IMDBCutDown.json", function (forImg) {
+                    // set a randomly rotating background image from the IMDB api
+                    var randPos = Math.floor(Math.random() * forImg.length);
+
+                    // grab the title and date and populate the random hero image message
+                    var randomImgMovieTitle = forImg[randPos].original_title;
+                    var randomImgMovieYear = forImg[randPos].year;
+                    $(".randomImgMsg").html("* image suggested by your ticket stub movie watch history<br/>" + randomImgMovieTitle + ", " + randomImgMovieYear);
+
+                    // setup IMDB API call
+                    var apiKey = "k_ve6zp8wd";
+                    var imdbID = forImg[randPos].imdb_title_id;
+                    var imdbJSON = "https://imdb-api.com/API/Images/" + apiKey + "/" + imdbID;
+
+                    $.getJSON(imdbJSON, function (imdbINFO) {
+                        var imgSrc = imdbINFO.items[0].image
+
+                        // set the background image and css to de-saturate it
+                        $(".heading").css({
+                            "background": "url(" + imgSrc + ") center top no-repeat",
+                            "background-size": "cover",
+                            "filter": "saturate(25%)"
+                        });
+                    });
+                });
+            }
+
+
+
+
+            function hideResultsSection() {
+                // hide the results section
+                $("div.pure-u-1.pure-u-md-1-2.pure-u-lg-1-4").css("display", "none");
+                $("div#results-section.pure-u-1").css("display", "none");
+            }
+
+
+
+
+
+            function gatherUserInput() {
+                // get user-input data from search fields
+                $("div.searchAtt1 select").change(function () {
+                    var searchAtt1Val = $("div.searchAtt1 option:selected").text().toLowerCase();
+                    $("#searchField1").attr("placeholder", "Typical movie " + searchAtt1Val + " from your watch history?");
+                });
+                $("div.searchAtt2 select").change(function () {
+                    var searchAtt2Val = $("div.searchAtt2 option:selected").text().toLowerCase();
+                    $("#searchField2").attr("placeholder", "Typical movie " + searchAtt2Val + " from your watch history?");
+                });
+                $("div.searchAtt3 select").change(function () {
+                    var searchAtt3Val = $("div.searchAtt3 option:selected").text().toLowerCase();
+                    $("#searchField3").attr("placeholder", "Typical movie " + searchAtt3Val + " from your watch history?");
+                });
+            }
+
+
+
+
+
+            function processUserInput() {
+                // create an array of user-inputted search items for passing on
+                var searchValArr = [];
+
+                // populate the array with the non-empty inputted values
+                for (var scount = 1; scount < 4; scount++) {
+                    // if the user has selected any search attribute & option
+                    if ($("div.searchAtt" + scount + " option:selected").text() !== "Choose..." && $("#searchField" + scount).val() !== "") {
+                        var searchValues = {};
+                        searchValues.searchAttribute = $("div.searchAtt" + scount + " option:selected").text();
+                        searchValues.searchFieldValue = $("#searchField" + scount).val();
+                        // add that to the results array
+                        searchValArr.push(searchValues);
+                    }
+                }
+
+                // if populated, pass the user search items into localStorage (overwrite previous stored values in the process)
+                if (searchValArr.length > 0) {
+                    localStorage.setItem("searchItems", JSON.stringify(searchValArr));
+                }
+                return searchValArr;
+            }
+
+
+
+
+
+            $(".detsLink").mousedown(
+                function () {
+                    // if one of the returned movies is clicked, update the selected value for that movie in local storage
+                    // mousedown functionality chosen as right-click open in new tab was not previously working
+
+                    // determine which movie was clicked
+                    var movieSelected = $(this).attr("id") - 1;  // since eg. fourth displayed result is pos 3 in the array
+                    console.log("Movie selected is number " + movieSelected);
+
+                    // bring down whatever's being stored in the localstorage
+                    var prevReturnedMovieIDs = JSON.parse(localStorage.getItem("returnedMovieIDs"));
+                    console.log("Parsed movie " + JSON.stringify(prevReturnedMovieIDs[movieSelected]));
+                    // flag this movie as the selected one
+                    prevReturnedMovieIDs[movieSelected].selected = "y";
+                    console.log("Parsed movie " + JSON.stringify(prevReturnedMovieIDs[movieSelected]));
+                    // now replace the old localstorage with this new store
+                    localStorage.setItem("returnedMovieIDs", JSON.stringify(prevReturnedMovieIDs));
+                });
+
+
+
+
+
+            // handle the simulation level slider
+            var range = $('.input-range'),
+                value = $('.range-value'),
+                simulationLvl = "",
+                navsDisplayed = "";
+            value.html(range.attr('value'));
+            range.on('input', function () {
+                // parse the range's value as an int to feed into the switch
+                switch (parseInt(this.value)) {
+                    case 1: simulationLvl = "Simulation Level: Flinch's Retro Algorithm [1950s] Recommended!";
+                        navsDisplayed = "&#x1405;";
+                        break;
+                    case 2: simulationLvl = "Simulation Level: 2nd Gen Algorithm [1960s]";
+                        navsDisplayed = "&#x140a;  &#x1405;";
+                        break;
+                    case 3: simulationLvl = "Simulation Level: 3rd Gen Algorithm [1980s]";
+                        navsDisplayed = "&#x140a;  &#x1405;";
+                        break;
+                    case 4: simulationLvl = "Simulation Level: Last Gen Algorithm [2010]";
+                        navsDisplayed = "&#x140a;  &#x1405;";
+                        break;
+                    case 5: simulationLvl = "Simulation Level: Modern Algorithm [2021]";
+                        // using unicode triangles as nav "arrows"
+                        navsDisplayed = "&#x140a;";
+                        break;
+                }
+                value.html(simulationLvl);
+                $(".navarrows").html(navsDisplayed);
+            })
+
+
+        });
+
+
+    </script>
+
+</head>
+
+<body>
+
+    <div id="layout">
+        <!-- Menu toggle -->
+        <a href="#menu" id="menuLink" class="menu-link">
+            <!-- Hamburger icon -->
+            <span></span>
+        </a>
+
+        <div id="menu">
+            <div class="pure-menu">
+
+                <div class="logo"><img src="images/ymal-logo-stub.png"></img></div>
+
+
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item pure-menu-selected"><a href="index.html" class="pure-menu-link">Home</a>
+                    </li>
+                    <li class="pure-menu-item"><a href="evolution.html" class="pure-menu-link">Evolution</a></li>
+                    <li class="pure-menu-item"><a href="uses.html" class="pure-menu-link">Uses | Misuses</a></li>
+                    <li class="pure-menu-item menu-item-divided"><a href="#" class="pure-menu-link">Login</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link" aria-haspopup="true">Watch
+                            History</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">'Maybe' List</a>
+                    </li>
+
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div id="main">
+
+            <div class="heading">
+                <div class="heading-box">
+                    <div class="heading-text">
+                        <h1>&#x201c; You May Also Like&#x201d;
+                        </h1>
+                        <h2>A Retro Watch-Next Algorithm</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- holds the movie title from the randomly presented hero image just as a viewer fyi-->
+            <div class="randomImgMsg"></div>
+
+            <div class="content">
+                <h2 class="content-subhead"></h2>
+
+                <!-- Accordion Section -->
+                <div class="pure-g">
+
+                    <div class="pure-u-1 mainaccordion">
+
+                        <h2 class="content-subhead tertiary-color" id="someHistory">Get What It's About</h2>
+
+                        <div class="tab pure-u-23-24">
+                            <input id="tab-1" type="checkbox">
+                            <label for="tab-1" class="main-color-block">Watch-Next Algorithm?</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong>These Days</strong></span>
+                                    media platforms and providers not only know what you have been watching, they
+                                    use that knowledge to track your preferences. One purpose is to
+                                    pipe that information into a machine algorithm in order to predict, and promote to
+                                    you movies you may like to watch next.
+                                </p>
+                                <p><span class="tertiary-color"><strong>But it used to be</strong></span>
+                                    that media providers had no way of knowing how to
+                                    market the next movie to you. <a href="#jumpIn" class="tertiary-color">Your
+                                        movie preferences</a> could not be predicted without knowing what you had
+                                    already watched. So how did we get from there to the watch-next predictions we are
+                                    used
+                                    to now? It's a story not without peril...
+                                </p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="tab pure-u-23-24">
+                            <input id="tab-2" type="checkbox">
+                            <label for="tab-2" class="main-color-block">All About the Stubs</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong>In 1952 - that's right, like Back To The
+                                            Future...</strong></span>
+                                    the first crude attempt at a watch-next algorithm was born. It happened when "Troxie
+                                    Movie Theater" employed a local kid, Albert Cherry to secretly follow
+                                    movie-goers as they exited the theater. Wee Albert was tasked by theater
+                                    manager Seamie Flinch with the job of collecting the used
+                                    ticket stubs dropped on the steps outside.
+                                </p>
+                                <p><span class="tertiary-color"><strong>Wee Albert kept records</strong></span>
+                                    of who had dropped which ticket stub and
+                                    therefore knew who had attended which movie. Flinch would
+                                    then manually collate wee Albert's notebook records creating his own database. He used this database for targeted promotion of movie releases at the Troxie theater.
+                                </p>
+                                <p><span class="tertiary-color"><strong>This was the inception of</strong></span>
+                                    the first primitive watch-next algorithm. It is in fact Flinch's Algorithm that
+                                    has been re-created here at "You May Also Like".
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <div class="tab pure-u-23-24">
+                            <input id="tab-3" type="checkbox">
+                            <label for="tab-3" class="main-color-block">Who Mentioned Accuracy?</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong>By today's standards</strong></span>
+                                    accuracy in Flinch's Algorithm was lacking. Indeed this <a href="evolution.html"
+                                        class="tertiary-color">eventually led to disaster and ruin!</a> But over the years, many
+                                    found alternative and novel uses for
+                                    its sometimes irregular results. Now you too can discover how to <a href="uses.html"
+                                        class="tertiary-color">turn algorithmic inaccuracy to your advantage...</a>
+                                </p>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div> <!-- End Main Accordion -->
+
+
+
+
+
+
+
+
+                <h2 class="content-subhead"></h2>
+
+                <!-- Search Form Section -->
+                <div class="pure-g">
+                    <div class="pure-u-1 pure-u-lg-1-4">
+                        <h2 class="content-subhead tertiary-color" id="jumpIn">Jump Right In!</h2>
+                        <p>
+                            <a href="#someHistory" class="linkinmain">Flinch's retro watch-next algorithm</a> would
+                            have estimated your watch history from your used movie-ticket stubs.
+                        </p>
+                        <p>
+                            For this re-created algorithm, let's type in some movie stuff. That way we simulate your watch history. It's
+                            how we replicate <a href="#someHistory" class="linkinmain">Wee Albert</a> gathering your ticket
+                            stub off the steps of The Troxie Theater.
+                        </p>
+                    </div>
+
+
+                    <div class="pure-u-1 pure-u-lg-3-4">
+                        <form class="pure-form pure-form-stacked">
+                            <fieldset class="fspadded">
+                                <legend>
+                                    <div class="pure-g">
+                                        <div class="pure-u-1-4">
+                                            Step 1.
+                                        </div>
+                                        <div class="pure-u-3-4">
+                                            Feed the algorithm your watch history
+                                        </div>
+                                    </div>
+                                </legend>
+                                <div class="pure-g">
+                                    <div class="pure-u-1 searchAtt1">
+                                        <select id="multi-searchby1" class="pure-input-23-24">
+                                            <option>Choose...</option>
+                                            <option>Title</option>
+                                            <option>Actor</option>
+                                            <option>Genre</option>
+                                        </select>
+                                    </div>
+                                    <div class="pure-u-1">
+                                        <input type="text" id="searchField1" class="pure-u-23-24" />
+                                    </div>
+                                </div>
+                                <div class="pure-g">
+                                    <div class="pure-u-1 searchAtt2">
+                                        <select class="pure-input-23-24">
+                                            <option>Choose...</option>
+                                            <option>Title</option>
+                                            <option>Actor</option>
+                                            <option>Genre</option>
+                                        </select>
+                                    </div>
+                                    <div class="pure-u-1">
+                                        <input type="text" id="searchField2" class="pure-u-23-24" />
+                                    </div>
+                                </div>
+                                <div class="pure-g">
+                                    <div class="pure-u-1 searchAtt3">
+                                        <select id="multi-searchby3" class="pure-input-23-24">
+                                            <option>Choose...</option>
+                                            <option>Title</option>
+                                            <option>Actor</option>
+                                            <option>Genre</option>
+                                        </select>
+                                    </div>
+                                    <div class="pure-u-1">
+                                        <input type="text" id="searchField3" class="pure-u-23-24" />
+                                    </div>
+                                </div>
+                                <legend class="anotherStep">
+                                    <div class="pure-g">
+                                        <div class="pure-u-1-4">
+                                            Step 2.
+                                        </div>
+                                        <div class="pure-u-3-4">
+                                            Choose whether you want a fully-retro watch-next experience or suggestions
+                                            from a more modern algorithm
+                                        </div>
+                                    </div>
+                                </legend>
+                                <div class="pure-g">
+                                    <div class="pure-u-1">
+                                        <div class="range-value"></div>
+                                        <div class="navarrows">&#x140a; &#x1405;</div>
+                                        <div class="range-slider">
+                                            <input class="input-range" type="range"
+                                                value="Simulation Level: 3rd Gen Algorithm [1980s]" min="1" max="5">
+                                        </div>
+
+
+
+
+                                    </div>
+                                </div>
+                                <legend class="anotherStep">
+                                    <div class="pure-g">
+                                        <div class="pure-u-1-4">
+                                            Step 3.
+                                        </div>
+                                        <div class="pure-u-3-4">
+                                            Discover movies a retro algorithm suggests
+                                        </div>
+                                    </div>
+                                </legend>
+
+                                <div class="pure-g">
+                                    <div class="pure-u-1 algo-button">
+                                        <div id="al-submit-button" class="pure-button pure-u-23-24 main-color-block">
+                                            You May Also Like...
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </fieldset>
+                        </form>
+
+
+                    </div>
+                </div> <!-- End of Form Section-->
+
+                <h2 class="content-subhead"></h2>
+
+
+                <!-- Search Results Section -->
+                <div class="pure-g">
+                    <div class="pure-u-1" id="results-section">
+                        <h2 id="rheader"></h2>
+                        <div class="pure-g">
+                            <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                                <div class="card">
+                                    <div class="rsection">
+                                        <a href="details.html" class="detsLink" id="1">
+                                            <img id="mimg1" src="" class="resImg">
+                                            <div id="mname1"></div>
+                                        </a>
+                                        <div id="mgenre1"></div>
+                                        <div id="mdirector1"></div>
+                                        <div id="myear1"></div>
+                                        <div id="mcast1"></div>
+                                        <div id="mdescription1"></div>
+                                        <div id="mmetas1"></div>
+                                        <div class="cardSpacer"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                                <div class="card">
+                                    <div class="rsection">
+                                        <a href="details.html" class="detsLink" id="2">
+                                            <img src="" alt="" id="mimg2" class="resImg">
+                                            <div id="mname2"></div>
+                                        </a>
+                                        <div id="mgenre2"></div>
+                                        <div id="mdirector2"></div>
+                                        <div id="myear2"></div>
+                                        <div id="mcast2"></div>
+                                        <div id="mdescription2"></div>
+                                        <div id="mmetas2"></div>
+                                        <div class="cardSpacer"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                                <div class="card">
+                                    <div class="rsection">
+                                        <a href="details.html" class="detsLink" id="3">
+                                            <img src="" alt="" id="mimg3" class="resImg">
+                                            <div id="mname3"></div>
+                                        </a>
+                                        <div id="mgenre3"></div>
+                                        <div id="mdirector3"></div>
+                                        <div id="myear3"></div>
+                                        <div id="mcast3"></div>
+                                        <div id="mdescription3"></div>
+                                        <div id="mmetas3"></div>
+                                        <div class="cardSpacer"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                                <div class="card">
+                                    <div class="rsection">
+                                        <a href="details.html" class="detsLink" id="4">
+                                            <img src="" alt="" id="mimg4" class="resImg">
+                                            <div id="mname4"></div>
+                                        </a>
+                                        <div id="mgenre4"></div>
+                                        <div id="mdirector4"></div>
+                                        <div id="myear4"></div>
+                                        <div id="mcast4"></div>
+                                        <div id="mdescription4"></div>
+                                        <div id="mmetas4"></div>
+                                        <div class="cardSpacer"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- End of Results Section -->
+
+
+
+
+            </div> <!-- End Content -->
+
+            <div class="footer secondary-color-block">
+                D Finlay for CSC7062 &COPY; 2021
+            </div>
+
+        </div> <!-- End of Main -->
+    </div>
+
+    <script src="purejs/ui.js"></script>
+
+
+</body>
+
+</html>

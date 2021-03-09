@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="D Finlay">
+    <meta name="description" content="Movie Suggestions a The Vintage Watch-Next Algorithm">
+    <title>You May Also Like &ndash; Evolution of Watch-Next Algorithms</title>
+
+    <!-- JQuery Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- AJAX Librry -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- PureCSS Framework -->
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/pure-min.css"
+        integrity="sha384-LTIDeidl25h2dPxrB2Ekgc9c7sEC3CWGM6HeFmuDNUjX76Ert4Z4IY714dhZHPLd" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/grids-responsive-min.css" />
+    <link rel="stylesheet" href="css/purecssstyles.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/homepage.css">
+
+
+    <script>
+        $(function () {
+
+            console.log("jQuery active");
+
+            // populate the hero image
+            $.getJSON("IMDBCutDown.json", function (forImg) {
+                // set a randomly rotating background image from the IMDB api
+                var randPos = Math.floor(Math.random() * forImg.length);
+
+                // grab the title and date and populate the random hero image message
+                var randomImgMovieTitle = forImg[randPos].original_title;
+                var randomImgMovieYear = forImg[randPos].year;
+                $(".randomImgMsg").html("* image suggested by your ticket stub movie watch history<br/>" + randomImgMovieTitle + ", " + randomImgMovieYear);
+
+                // setup IMDB API call
+                var apiKey = "k_ve6zp8wd";
+                var imdbID = forImg[randPos].imdb_title_id;
+                var imdbJSON = "https://imdb-api.com/API/Images/" + apiKey + "/" + imdbID;
+
+                $.getJSON(imdbJSON, function (imdbINFO) {
+                    var imgSrc = imdbINFO.items[0].image
+
+                    // set the background image and css to de-saturate it
+                    $(".heading").css({
+                        "background": "url(" + imgSrc + ") center top no-repeat",
+                        "background-size": "cover",
+                        "filter": "saturate(25%)"
+                    });
+                });
+            });
+
+
+
+
+        });
+
+
+    </script>
+
+</head>
+
+<body>
+
+    <div id="layout">
+        <!-- Menu toggle -->
+        <a href="#menu" id="menuLink" class="menu-link">
+            <!-- Hamburger icon -->
+            <span></span>
+        </a>
+
+        <div id="menu">
+            <div class="pure-menu">
+                <div class="logo"><img src="images/ymal-logo-stub.png"></img></div>
+
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="index.html" class="pure-menu-link">Home</a></li>
+                    <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Evolution</a></li>
+                    <li class="pure-menu-item"><a href="uses.html" class="pure-menu-link">Uses | Misuses</a></li>
+                    <li class="pure-menu-item menu-item-divided"><a href="#" class="pure-menu-link">Login</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link" aria-haspopup="true">Watch
+                            History</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">'Maybe' List</a>
+                    </li>
+
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div id="main">
+
+            <div class="heading">
+                <div class="heading-box">
+                    <div class="heading-text">
+                        <h1>&#x201c; You May Also Like&#x201d;</h1>
+                        <h2><em>Evolving</em>&nbsp;&nbsp;Algorithms</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- holds the movie title from the randomly presented hero image just as a viewer fyi-->
+            <div class="randomImgMsg"></div>
+
+            <div class="content">
+                <h2 class="content-subhead"></h2>
+
+                <!-- Accordion Section 1 -->
+                <div class="pure-g">
+
+                    <div class="pure-u-1 mainaccordion">
+
+                        <h2 class="content-subhead tertiary-color">Part1. Algorithmic Megalomania</h2>
+
+                        <div class="tab ">
+                            <input id="tab-1" type="checkbox">
+                            <label for="tab-1" class="main-color-block">Seeds of Success</label>
+                            <div class="tab-content">
+
+                                <p><span class="tertiary-color"><strong></strong>Following the idea for <a
+                                            href="index.html#someHistory">the initial watch-next algorithm</a>
+
+                                        </strong></span> Flinch continued to expand his dataset from the fruits of wee
+                                    Albert's after-movie notebook
+                                    scribblings.
+                                    He began a successful pampleting campaign on the release of each new movie
+                                    at the
+                                    Troxie.
+                                    He would meticulously scan his dataset for potential viewer matches.
+                                    Then he would mail out VIP-style invitations.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>Flinch's Algorithm worked!
+                                        </strong></span>
+                                    Movie audiences felt valued. And the Troxie began - and continued - to see
+                                    significant year-on-year revenue growth through the second half of the
+                                    1950s.
+                                    This sparked great interest from news outlets. Not all commentators were
+                                    sympathetic
+                                    to Flinch's aims or methods.
+                                    Reportedly, Flinch's discovery was also sparking great envy among his
+                                    competitors.
+                                </p>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="tab ">
+                            <input id="tab-2" type="checkbox">
+                            <label for="tab-2" class="main-color-block">Uncensored Screenings</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>1958 saw the peak of the algorithm's
+                                        success
+                                        </strong></span> Coinciding with it, Flinch
+                                    was accused of heinous misdoings when three members of the local gentlemen's
+                                    rotary fellowship were wrongly petitioned to come and view a risque,
+                                    uncensored foreign movie.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>Flinch protested
+                                        </strong></span>
+                                    the pamphlets were not of his doing and that the reported
+                                    under-the-counter movie never had any planned screenings at the Troxie.
+                                    But the flames of the story were fanned by Flinch's critics.
+                                    Those flames could not be extinguished.
+                                </p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="tab ">
+                            <input id="tab-3" type="checkbox">
+                            <label for="tab-3" class="main-color-block">Profiling and Anger</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>The resulting community inferno
+                                        </strong></span> was catalysed the more once the
+                                    newspaper front-paged the story. Many readers, previously unaware, realised that
+                                    they
+                                    themselves were potentially being profiled through Flinch's stub-retention
+                                    algorithm. On that
+                                    revelation, uproar turned to anger.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>Anarchic placard protestors
+                                        </strong></span>
+                                    gathered regularly
+                                    at the Troxie, harassing and attempting to intimidate movie attendees while
+                                    demanding Flinch shelve his
+                                    algorithm. Flinch though, was not only unrepentant but was increasingly hostile.
+                                </p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="tab ">
+                            <input id="tab-4" type="checkbox">
+                            <label for="tab-4" class="main-color-block">Unsubstantiated Plotting</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>At the same time
+                                        </strong></span> it was reported that Flinch was subject to threats on himself
+                                    and his property. Many locals were angry at the profiling. Curiously though, many
+                                    seemed
+                                    unconcerned with the concept of being reduced to data. As a result, the Troxie
+                                    continued to
+                                    profit.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>Competitors on the other hand
+                                        </strong></span>
+                                    became increasingly provoked as their premises
+                                    underwent dramatic decline. Though never substantiated, it was claimed that a
+                                    plot existed to put Flinch out of business...
+                                </p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="tab ">
+                            <input id="tab-5" type="checkbox">
+                            <label for="tab-5" class="main-color-block">The End... Or?</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>But in December 1959
+                                        </strong></span> accumulated local anger turned to righteous
+                                    indignation after revelations that Flinch had not only been paying wee Albert in
+                                    the dregs from spent Buckfast bottles (a poteen brand locally outlawed at the
+                                    time)
+                                    but also that Albert had himself developed a permanent stoop from collecting
+                                    stubs off of the Troxie steps.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>New Year's Eve
+                                        </strong></span>
+                                    as the decade ended, the Troxie burned to the ground. The Fire
+                                    Station Chief declared the cause of the blaze to be a firework. Arson was suspected.
+                                    It was never proven. The building and Flinch's algorithmic records were destroyed.
+                                </p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="tab ">
+                            <input id="tab-6" type="checkbox">
+                            <label for="tab-6" class="main-color-block">Wee Albert?</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>Wee Albert went missing
+                                        </strong></span> It was widely rumoured that Albert had absconded
+                                    with the core component of Flinch's algorithm: the notebook dataset.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>As the new decade began
+                                        </strong></span>
+                                    Albert was never heard from again.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <h2 class="content-subhead"></h2>
+                    <!-- Accordion Section 2 -->
+                    <div class="pure-u-1 mainaccordion">
+
+                        <h2 class="content-subhead tertiary-color anotherStep">Part2. Gangsters of the Algorithm</h2>
+
+
+                        <div class="tab ">
+                            <input id="tab-7" type="checkbox">
+                            <label for="tab-7" class="main-color-block">The Era of King Geordie</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>Realising the lucrative potential
+                                        </strong></span> of good watch-next algorithms prompted the
+                                    great algorithmic accuracy rush of the 1960s. It was and part-time movie mogul
+                                    Geordie Haddock of King George Studios that spearheaded advanced algorithmic
+                                    watch-next research.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>Even more info
+                                        </strong></span>
+                                    Even more info
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+
+                </div>
+
+
+
+                <h2 class="content-subhead"></h2>
+
+
+                <div class="pure-g">
+
+                    <div class="pure-u-1">
+
+                        <!-- Interact Section -->
+                        <div class="interact">
+                            <div class="pure-g">
+                                <div class="pure-u-1 int-button">
+                                    <div id="intbut1" class="pure-button pure-u-23-24 main-color-block">
+                                        Some Interactivity??
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 int-button">
+                                    <div id="intbut2" class="pure-button pure-u-23-24 main-color-block">
+                                        Some Interactivity??
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 int-button">
+                                    <div id="intbut3" class="pure-button pure-u-23-24 main-color-block">
+                                        Some Interactivity??
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 int-button social">
+
+                                    <ul class="share-buttons">
+                                        <li><a href="https://www.facebook.com/sharer/sharer.php?u=&quote="
+                                                title="Share on Facebook" target="_blank"
+                                                onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(document.URL) + '&quote=' + encodeURIComponent(document.URL)); return false;"><img
+                                                    alt="Share on Facebook" src="images/Facebook.png" /></a></li>
+                                        <li><a href="https://twitter.com/intent/tweet?source=&text=:%20" target="_blank"
+                                                title="Tweet"
+                                                onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(document.title) + ':%20'  + encodeURIComponent(document.URL)); return false;"><img
+                                                    alt="Tweet" src="images/Twitter.png" /></a></li>
+                                        <li><a href="http://pinterest.com/pin/create/button/?url=&description="
+                                                target="_blank" title="Pin it"
+                                                onclick="window.open('http://pinterest.com/pin/create/button/?url=' + encodeURIComponent(document.URL) + '&description=' +  encodeURIComponent(document.title)); return false;"><img
+                                                    alt="Pin it" src="images/Pinterest.png" /></a></li>
+                                        <li><a href="http://www.reddit.com/submit?url=&title=" target="_blank"
+                                                title="Submit to Reddit"
+                                                onclick="window.open('http://www.reddit.com/submit?url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"><img
+                                                    alt="Submit to Reddit" src="images/Reddit.png" /></a></li>
+                                        <li><a href="http://www.linkedin.com/shareArticle?mini=true&url=&title=&summary=&source="
+                                                target="_blank" title="Share on LinkedIn"
+                                                onclick="window.open('http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"><img
+                                                    alt="Share on LinkedIn" src="images/LinkedIn.png" /></a></li>
+                                        <li><a href="mailto:?subject=&body=:%20" target="_blank" title="Send email"
+                                                onclick="window.open('mailto:?subject=' + encodeURIComponent(document.title) + '&body=' +  encodeURIComponent(document.URL)); return false;"><img
+                                                    alt="Send email" src="images/Email.png" /></a></li>
+                                    </ul>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                </div> <!-- End details -->
+
+
+            </div>
+
+        </div> <!-- End Main Section -->
+
+        <div class="footer secondary-color-block">
+            D Finlay for CSC7062 &COPY; 2021
+        </div>
+
+        <script src="purejs/ui.js"></script>
+
+
+</body>
+
+</html>

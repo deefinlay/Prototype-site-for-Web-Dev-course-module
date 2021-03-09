@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="D Finlay">
+    <meta name="description" content="Movie Suggestions a The Vintage Watch-Next Algorithm">
+    <title>You May Also Like &ndash; Uses for The Retro Watch-Next Algorithm</title>
+
+    <!-- JQuery Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- AJAX Librry -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- PureCSS Framework -->
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/pure-min.css"
+        integrity="sha384-LTIDeidl25h2dPxrB2Ekgc9c7sEC3CWGM6HeFmuDNUjX76Ert4Z4IY714dhZHPLd" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/grids-responsive-min.css" />
+    <link rel="stylesheet" href="css/purecssstyles.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/homepage.css">
+
+
+    <script>
+        $(function () {
+
+            console.log("jQuery active");
+
+            // populate the hero image
+            $.getJSON("IMDBCutDown.json", function (forImg) {
+                // set a randomly rotating background image from the IMDB api
+                var randPos = Math.floor(Math.random() * forImg.length);
+
+                // grab the title and date and populate the random hero image message
+                var randomImgMovieTitle = forImg[randPos].original_title;
+                var randomImgMovieYear = forImg[randPos].year;
+                $(".randomImgMsg").html("* image suggested by your ticket stub movie watch history<br/>" + randomImgMovieTitle + ", " + randomImgMovieYear);
+
+                // setup IMDB API call
+                var apiKey = "k_ve6zp8wd";
+                var imdbID = forImg[randPos].imdb_title_id;
+                var imdbJSON = "https://imdb-api.com/API/Images/" + apiKey + "/" + imdbID;
+
+                $.getJSON(imdbJSON, function (imdbINFO) {
+                    var imgSrc = imdbINFO.items[0].image
+
+                    // set the background image and css to de-saturate it
+                    $(".heading").css({
+                        "background": "url(" + imgSrc + ") center top no-repeat",
+                        "background-size": "cover",
+                        "filter": "saturate(25%)"
+                    });
+                });
+            });
+
+
+
+
+        });
+
+
+    </script>
+
+</head>
+
+<body>
+
+    <div id="layout">
+        <!-- Menu toggle -->
+        <a href="#menu" id="menuLink" class="menu-link">
+            <!-- Hamburger icon -->
+            <span></span>
+        </a>
+
+        <div id="menu">
+            <div class="pure-menu">
+                <div class="logo"><img src="images/ymal-logo-stub.png"></img></div>
+
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="index.html" class="pure-menu-link">Home</a></li>
+                    <li class="pure-menu-item"><a href="evolution.html" class="pure-menu-link">Evolution</a></li>
+                    <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Uses | Misuses</a>
+                    </li>
+                    <li class="pure-menu-item menu-item-divided"><a href="#" class="pure-menu-link">Login</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link" aria-haspopup="true">Watch
+                            History</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">'Maybe' List</a>
+                    </li>
+
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div id="main">
+
+            <div class="heading">
+                <div class="heading-box">
+                    <div class="heading-text">
+                        <h1>&#x201c; You May Also Like&#x201d;</h1>
+                        <h2><em>Using</em>&nbsp;&nbsp;The Retro Algorithm</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- holds the movie title from the randomly presented hero image just as a viewer fyi-->
+            <div class="randomImgMsg"></div>
+
+            <div class="content">
+                <h2 class="content-subhead"></h2>
+
+                <!-- Accordion Section 1 -->
+                <div class="pure-g">
+
+                    <div class="pure-u-1 mainaccordion">
+
+                        <h2 class="content-subhead tertiary-color">Part1. Approved Usage</h2>
+                        <p>Retro watch-next algorithms are subject to a degree of unpredictabity and often
+                            inappropriateness in their suggested watch-next movie results. Owing to this side-effect, a
+                            number of suggested healthy and governmentally-approved uses have been both proposed and
+                            capitalised upon over the decades for the enjoyment of
+                            patrons. These may be summarised as follows...</p>
+                        <div class="tab ">
+                            <input id="tab-1" type="checkbox">
+                            <label for="tab-1" class="main-color-block">Undoing Viewer Stagnation</label>
+                            <div class="tab-content">
+
+                                <p><span class="tertiary-color"><strong></strong>Viewer Stagnation is a well researched
+                                        theory
+                                        </strong></span> that you may study out on your own time. The principal tenet of
+                                    which
+                                    is that after a period of time, viewers will lapse into a pattern of watching the
+                                    same
+                                    genre, style, or storylines.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>It ought to make sense then
+                                        </strong></span>
+                                    that the opportunity for randomness in the results from the retro watch-next
+                                    algorithm
+                                    may be capitalised upon here. If you feel you are suffering from Viewer Stagnation,
+                                    please
+                                    consult your medical practitioner at your earliest opportunity. However, if you have
+                                    been
+                                    vaccinated already, you may use the recreated algorithm here at "You May Also Like"
+                                    to suppress
+                                    any residual symptoms of VS. Just <a href="index.html#jumpIn">enter your
+                                        watch-history</a> and begin.
+                                </p>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="tab ">
+                            <input id="tab-2" type="checkbox">
+                            <label for="tab-2" class="main-color-block">Random Reverse Search</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>For any given watch-history
+                                        </strong></span> that you may provide to the algorithm, there is a
+                                    corresponding set of watch-next movie suggestions returned. One popular game
+                                    from the 1970s involved using the retro algorithm in reverse.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>How?
+                                        </strong></span>
+                                    By thinking of a certain movie. Then <a href="index.html#jumpIn">entering your
+                                        watch-history</a>. But
+                                    doing so in such a way that the movie you thought of is returned as a watch-next
+                                    suggestion. Be careful though!
+                                    The algorithm can be unpredictable. So think more randomly, and less predictably for
+                                    fun times and success!
+                                </p>
+                            </div>
+                        </div>
+
+
+
+                        <div class="tab ">
+                            <input id="tab-3" type="checkbox">
+                            <label for="tab-3" class="main-color-block">Alt-Movie Night</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>In the 1990s science had yet to
+                                        discover computers or binge-watching.
+                                        </strong></span> In a society lacking the knowledge given to us by American Pie
+                                    and the Saw franchise, people turned instead
+                                    to alternative movie Saturdays.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>A joyful single pizza slice and light beer
+                                        </strong></span>
+                                    were the traditionally suggested accompaniments to alt-movie night. Chosen in order not to
+                                    spoil the entertainment or engender rowdiness. Should you engage in using the algorithm
+                                    to <a href="index.html#jumpIn">source alt-movies</a> for your alt-movie Saturday, you may 
+                                    instead choose a half-glass of wine. Or stick with water.
+                                </p>
+                            </div>
+                        </div>
+
+
+
+
+
+                    </div>
+
+
+                    <h2 class="content-subhead"></h2>
+                    <!-- Accordion Section 2 -->
+                    <div class="pure-u-1 mainaccordion">
+
+                        <h2 class="content-subhead tertiary-color anotherStep">Part2. Perilous Misuse and Miscreancy
+                        </h2>
+                        <p>Of course, there are always those that seek to rail against what is naturally wholesome. If
+                            you are one of
+                            those folk, it would be remiss of "You May Also Like", churlish at worst not to mention
+                            those activities. Activities, it must be repeated, that are governmentally-unsanctioned.
+                            Such as these stem from the frequently inaccurate results yielded
+                            from retro watch-next algorithms. These must necessarily come with a warning. It is well
+                            documented that participants in such activities have been overcome by movie madness and
+                            various other physical perturbances as a direct result. Caveat Emptor!</p>
+
+                        <div class="tab ">
+                            <input id="tab-7" type="checkbox">
+                            <label for="tab-7" class="main-color-block">Start Weird, Get Weirder</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>Pushing the envelope of the algorithm
+                                        </strong></span> by seeding it not with regular movie titles and accepting the
+                                    unpredictability of the results. Instead, patrons seeded the retro algorithm's watch
+                                    history with edge-case movies, many called the activity the Strangest Of The
+                                    Strange.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>It was widely reported in the late
+                                        1980s
+                                        </strong></span>
+                                    what participants were widely afflicted with uncontrollable laughter and rampant
+                                    optimism,
+                                    neither of which ought to be taken lightly as a potential hazard should you choose
+                                    to <a href="index.html#jumpIn">dabble with algorithm misuse</a> in such a fashion.
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <div class="tab ">
+                            <input id="tab-8" type="checkbox">
+                            <label for="tab-8" class="main-color-block">Movie M***chism</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong></strong>A topic for the strong of constitution
+                                        </strong></span> though it was reported that some users of the retro algorithm
+                                    deployed it to ends that were altogether unwholesome. Such users were apparently
+                                    motivated to inflict movie distress upon themselves.
+                                </p>
+                                <p><span class="tertiary-color"><strong></strong>Without too much elaboration
+                                        </strong></span>
+                                    This act involved the user subjecting themselves (voluntarily, it might be added) to
+                                    watching whichever
+                                    movies the algorithm returned regardless of their own health, safety or sanity. And not
+                                    just singly, but
+                                    consuming all of the algorithm's movies in one sitting. Or perhaps lying. It's unclear
+                                    from the autopsies.
+                                    If you must <a href="index.html#jumpIn">engage in such behaviour</a>, do so at your own
+                                    peril!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+            </div>
+
+
+
+            <h2 class="content-subhead"></h2>
+
+
+            <div class="pure-g">
+
+                <div class="pure-u-1">
+
+                    <!-- Interact Section -->
+                    <div class="interact">
+                        <div class="pure-g">
+                            <div class="pure-u-1 int-button">
+                                <div id="intbut1" class="pure-button pure-u-23-24 main-color-block">
+                                    Some Interactivity??
+                                </div>
+                            </div>
+                            <div class="pure-u-1 int-button">
+                                <div id="intbut2" class="pure-button pure-u-23-24 main-color-block">
+                                    Some Interactivity??
+                                </div>
+                            </div>
+                            <div class="pure-u-1 int-button">
+                                <div id="intbut3" class="pure-button pure-u-23-24 main-color-block">
+                                    Some Interactivity??
+                                </div>
+                            </div>
+                            <div class="pure-u-1 int-button social">
+
+                                <ul class="share-buttons">
+                                    <li><a href="https://www.facebook.com/sharer/sharer.php?u=&quote="
+                                            title="Share on Facebook" target="_blank"
+                                            onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(document.URL) + '&quote=' + encodeURIComponent(document.URL)); return false;"><img
+                                                alt="Share on Facebook" src="images/Facebook.png" /></a></li>
+                                    <li><a href="https://twitter.com/intent/tweet?source=&text=:%20" target="_blank"
+                                            title="Tweet"
+                                            onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(document.title) + ':%20'  + encodeURIComponent(document.URL)); return false;"><img
+                                                alt="Tweet" src="images/Twitter.png" /></a></li>
+                                    <li><a href="http://pinterest.com/pin/create/button/?url=&description="
+                                            target="_blank" title="Pin it"
+                                            onclick="window.open('http://pinterest.com/pin/create/button/?url=' + encodeURIComponent(document.URL) + '&description=' +  encodeURIComponent(document.title)); return false;"><img
+                                                alt="Pin it" src="images/Pinterest.png" /></a></li>
+                                    <li><a href="http://www.reddit.com/submit?url=&title=" target="_blank"
+                                            title="Submit to Reddit"
+                                            onclick="window.open('http://www.reddit.com/submit?url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"><img
+                                                alt="Submit to Reddit" src="images/Reddit.png" /></a></li>
+                                    <li><a href="http://www.linkedin.com/shareArticle?mini=true&url=&title=&summary=&source="
+                                            target="_blank" title="Share on LinkedIn"
+                                            onclick="window.open('http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"><img
+                                                alt="Share on LinkedIn" src="images/LinkedIn.png" /></a></li>
+                                    <li><a href="mailto:?subject=&body=:%20" target="_blank" title="Send email"
+                                            onclick="window.open('mailto:?subject=' + encodeURIComponent(document.title) + '&body=' +  encodeURIComponent(document.URL)); return false;"><img
+                                                alt="Send email" src="images/Email.png" /></a></li>
+                                </ul>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+            </div> <!-- End details -->
+
+
+        </div>
+
+    </div> <!-- End Main Section -->
+
+    <div class="footer secondary-color-block">
+        D Finlay for CSC7062 &COPY; 2021
+    </div>
+
+    <script src="purejs/ui.js"></script>
+
+
+</body>
+
+</html>

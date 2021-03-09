@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="D Finlay">
+    <meta name="description" content="Movie Suggestions a The Vintage Watch-Next Algorithm">
+    <title></title>
+
+    <!-- JQuery Library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- AJAX Librry -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- PureCSS Framework -->
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/pure-min.css"
+        integrity="sha384-LTIDeidl25h2dPxrB2Ekgc9c7sEC3CWGM6HeFmuDNUjX76Ert4Z4IY714dhZHPLd" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.5/build/grids-responsive-min.css" />
+    <link rel="stylesheet" href="css/purecssstyles.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/detailspage.css">
+
+
+    <script>
+        $(function () {
+
+            console.log("jQuery active");
+
+            $.ajax({
+                // for now, simply the actual JSON of all movies for testing
+                // for testing this will represent a results file returned from a database?
+                url: "IMDBCutDown.json", success: function (result) {
+
+                    // set the page title
+                    // first get the selected movie id from local storage
+                    var prevReturnedMovieIDs = JSON.parse(localStorage.getItem("returnedMovieIDs"));
+                    let selectedMovie = prevReturnedMovieIDs.find(mov => mov.selected == "y");
+                    let selectedID = selectedMovie.movieID;
+
+                    // now grab that movie from the cut down IMDB list
+                    let thisMovie = result.find(mov => mov.imdb_title_id == selectedID);
+                    $("title").html("You May Also Like &ndash; the Movie " + thisMovie.original_title);
+
+                    // populate the main h1 page title
+                    $(".heading-text>h1").html("&#x201c; " + thisMovie.original_title + "&#x201d");
+
+                    // populate the hero image
+                    getHeroImg(thisMovie);
+
+                    // populate the movie details fields
+                    populateDetails(thisMovie);
+
+                    // populate the movie images
+                    populateImages(thisMovie);
+                }
+            });
+
+
+
+            function getHeroImg(movie) {
+
+                // grab the title and date and populate the random hero image message
+                var MovieTitle = movie.original_title;
+                var MovieYear = movie.year;
+                $(".imgMsg").html("* image from <br/>" + MovieTitle + ", " + MovieYear);
+
+
+                // setup IMDB API call
+                var apiKey = "k_ve6zp8wd";
+                var imdbID = movie.imdb_title_id;
+                var imdbJSON = "https://imdb-api.com/API/Images/" + apiKey + "/" + imdbID;
+
+                $.getJSON(imdbJSON, function (imdbINFO) {
+                    // set a randomly rotating background image from the movie's array of images from the IMDB api
+                    var randPos = Math.floor(Math.random() * imdbINFO.items.length);
+                    var imgSrc = imdbINFO.items[randPos].image;
+
+                    // set the background image and css to de-saturate it
+                    $(".heading").css({
+                        "background": "url(" + imgSrc + ") center top no-repeat",
+                        "background-size": "cover",
+                        "filter": "saturate(25%)"
+                    });
+                });
+            }
+
+
+
+
+            function populateDetails(movie) {
+                $("#mname").html("<h3 class='tertiary-color'>Title: " + movie.original_title + "</h3>");
+                $("#mgenre").html("<p><span class='tertiary-color'><em>Genre: </em></span>" + ((movie.genre == undefined || movie.genre == '') ? "Unknown" : movie.genre) + "</p>");
+                $("#mdirector").html("<p><span class='tertiary-color'><em>Director: </em></span>" + ((movie.director == undefined || movie.director == '') ? "Unknown" : movie.director) + "</p>");
+                $("#myear").html("<p><span class='tertiary-color'><em>Year: </em></span>" + ((movie.year == undefined || movie.year == '') ? "Unknown" : movie.year) + "</p>");
+                $("#mduration").html("<p><span class='tertiary-color'><em>Duration: </em></span>" + ((movie.duration == undefined || movie.duration == '') ? "Unknown" : movie.duration) + "min</p>");
+                $("#mcountry").html("<p><span class='tertiary-color'><em>Country: </em></span>" + ((movie.country == undefined || movie.country == '') ? "Unknown" : movie.country) + "</p>");
+                $("#mwriter").html("<p><span class='tertiary-color'><em>Writer: </em></span>" + ((movie.writer == undefined || movie.writer == '') ? "Unknown" : movie.writer) + "</p>");
+                $("#mproduction").html("<p><span class='tertiary-color'><em>Production: </em></span>" + ((movie.production_company == undefined || movie.production_company == '') ? "Unknown" : movie.production_company) + "</p>");
+                $("#mcast").html("<p><span class='tertiary-color'><em>Cast: </em></span>" + ((movie.actors == undefined) ? "Unknown" : movie.actors || movie.actors == '') + "</p>");
+                $("#mstory").html("<p><span class='tertiary-color'><em>Story: </em></span>" + ((movie.description == undefined) ? "Unknown" : movie.description || movie.description == '') + "</p>");
+                $("#mbudget").html("<p><span class='tertiary-color'><em>Budget: </em></span>" + ((movie.budget == undefined || movie.budget == '') ? "Unknown" : movie.budget) + "</p>");
+                $("#mgross").html("<p><span class='tertiary-color'><em>Gross: </em></span>" + ((movie.worldwide_gross_income == undefined || movie.worldwide_gross_income == '') ? "Unknown" : movie.worldwide_gross_income) + "</p>");
+                var meta = (movie.avg_vote) * 10;
+                $("#mmetas").html("<p><span class='tertiary-color'><em>Meta: </em></span>" + meta + "/100</p>");
+            }
+
+
+
+
+            function populateImages(movie) {
+                // uses the IMDB API
+
+                // setup the API call
+                var apiKey = "k_ve6zp8wd";
+                var imdbID = movie.imdb_title_id
+                var imdbJSON = "https://imdb-api.com/API/Images/" + apiKey + "/" + imdbID;
+
+                // grab images from api call
+                $.ajax({
+                    url: imdbJSON, success: function (imdbINFO) {
+                        var movieImages = [];
+                        for (var icount = 0; icount < imdbINFO.items.length; icount++) {
+                            var imageAndTitle = {};
+                            imageAndTitle.image = imdbINFO.items[icount].image;
+                            imageAndTitle.title = imdbINFO.items[icount].title;
+                            movieImages.push(imageAndTitle);
+                        }
+                        console.log("got " + movieImages.length + " images");
+
+                        // populate the image divs
+                        // based on the lesser of either the number of images returned or the 12 div page limit
+                        var maxImages = (movieImages.length >= 12) ? 12 : movieImages.length;
+                        for (var mcount = 0; mcount < maxImages; mcount++) {
+                            $("#mimg" + mcount).attr("src", movieImages[mcount].image);
+
+                            // populate the image description field too and use this as the alt description for the image
+                            if (movieImages[mcount].title == undefined) {
+                                $("#desc" + mcount).html("Image " + mcount + " from " + movieImages[mcount].title);
+                            } else {
+                                $("#mimg" + mcount).attr("alt", movieImages[mcount].title);
+                                $("#desc" + mcount).html("<p>" + movieImages[mcount].title + "</p>");
+                            }
+
+                            // setup the css "visible" properties for the card (the parent of the image element)
+                            $("#mimg" + mcount).parent().css({
+                                "box-shadow": "0 6px 4px 0 rgba(0, 0, 0, 0.5)",
+                                "border": "3px solid #302e2a"
+                            });
+                        }
+                    }
+                });
+
+            }
+
+
+        });
+
+
+    </script>
+
+</head>
+
+<body>
+
+    <div id="layout">
+        <!-- Menu toggle -->
+        <a href="#menu" id="menuLink" class="menu-link">
+            <!-- Hamburger icon -->
+            <span></span>
+        </a>
+
+        <div id="menu">
+            <div class="pure-menu">
+                <div class="logo"><img src="images/ymal-logo-stub.png"></img></div>
+
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="index.html" class="pure-menu-link">Home</a></li>
+                    <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Movie</a></li>
+                    <li class="pure-menu-item"><a href="evolution.html" class="pure-menu-link">Evolution</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Uses | Misuses</a></li>
+                    <li class="pure-menu-item menu-item-divided"><a href="#" class="pure-menu-link">Login</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link" aria-haspopup="true">Watch
+                            History</a></li>
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">'Maybe' List</a>
+                    </li>
+
+                    <li class="pure-menu-item"><a href="#" class="pure-menu-link">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div id="main">
+
+            <div class="heading">
+                <div class="heading-box">
+                    <div class="heading-text">
+                        <h1></h1>
+                        <h2><em>suggested by</em>&nbsp;&nbsp;You May Also Like</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- holds the movie title from the randomly presented hero image just as a viewer fyi-->
+            <div class="imgMsg"></div>
+
+            <div class="content">
+                <h2 class="content-subhead"></h2>
+
+                <!-- Accordion Section -->
+                <div class="pure-g">
+
+                    <div class="pure-u-1 mainaccordion">
+
+                        <h2 class="content-subhead tertiary-color">The Retro Algorithm Suggested <em>This</em> ?</h2>
+
+                        <div class="tab ">
+                            <input id="tab-1" type="checkbox">
+                            <label for="tab-1" class="main-color-block">The Age-Old Question of Watch-Next Algorithms</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong>Why Am I Seeing This?</strong></span>
+                                   The answer lies in the level of accuracy or inaccuracy of the algorithm. If you chose
+                                   to simulate the full retro experience, recreated here from <a href="index.html#someHistory">Flinch's Algorithm</a>
+                                   then you may notice that the selection of results was less accurate than had you chosen
+                                   a simulation of a more modern algorithm.
+                                </p>
+                                <p><span class="tertiary-color"><strong>Now you know how they felt in Flinch's day</strong></span>
+                                    How would you react had you had this movie marketed to you as something "You May Also Like"?
+                                    Would you be happy? Curious? Incensed?     
+                                </p>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="tab">
+                            <input id="tab-4" type="checkbox">
+                            <label for="tab-4" class="main-color-block">What Now?</label>
+                            <div class="tab-content">
+                                <p><span class="tertiary-color"><strong>Use and Misuse of The Algorithm</strong></span>
+                                    Take a look at the various <a href="uses.html">ways to utilise this retro watch-next algorithm</a>
+                                    , from healthy government-sanctioned entertainment, to other, less becoming things...
+                                </p>
+                                <p><span class="tertiary-color"><strong>Share and Spread the Word!
+                                     </strong></span>
+                                     Use the <a href="#social-section">social section</a> below to share movie results like this with your discerning social circle
+                                     and the wider world.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div> <!-- End Accordion -->
+
+
+                <h2 class="content-subhead"></h2>
+
+
+                <div class="pure-g">
+
+
+
+                    <div class="pure-u-1 pure-u-md-1-2">
+
+                        <!-- Details Section -->
+                        <div class="mdetails">
+                            <div id="mname"></div>
+                            <div id="mgenre"></div>
+                            <div id="mdirector"></div>
+                            <div id="myear"></div>
+                            <div id="mduration"></div>
+                            <div id="mcountry"></div>
+                            <div id="mwriter"></div>
+                            <div id="mproduction"></div>
+                            <div id="mcast"></div>
+                            <div id="mstory"></div>
+                            <div id="mbudget"></div>
+                            <div id="mgross"></div>
+                            <div id="mmetas"></div>
+                        </div>
+                    </div>
+
+                    <div class="pure-u-1 pure-u-md-1-2">
+
+                        <!-- Interact Section -->
+                        <div class="interact">
+                            <div class="pure-g">
+                                <div class="pure-u-1 int-button">
+                                    <div id="intbut1" class="pure-button pure-u-23-24 main-color-block">
+                                        Add to "Maybe" List
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 int-button">
+                                    <div id="intbut2" class="pure-button pure-u-23-24 main-color-block">
+                                        View "Maybe" List
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 int-button">
+                                    <div id="intbut3" class="pure-button pure-u-23-24 main-color-block">
+                                        Seed Watch History
+                                    </div>
+                                </div>
+                                
+                                <div class="pure-u-1 int-button social" id="social-section">
+                                    <h2 class="content-subhead tertiary-color">Share Your Suggested Movie!</h2>
+                                    <ul class="share-buttons">
+                                        <li><a href="https://www.facebook.com/sharer/sharer.php?u=&quote=" title="Share on Facebook" target="_blank" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(document.URL) + '&quote=' + encodeURIComponent(document.URL)); return false;"><img alt="Share on Facebook" src="images/Facebook.png" /></a></li>
+                                        <li><a href="https://twitter.com/intent/tweet?source=&text=:%20" target="_blank" title="Tweet" onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(document.title) + ':%20'  + encodeURIComponent(document.URL)); return false;"><img alt="Tweet" src="images/Twitter.png" /></a></li>
+                                        <li><a href="http://pinterest.com/pin/create/button/?url=&description=" target="_blank" title="Pin it" onclick="window.open('http://pinterest.com/pin/create/button/?url=' + encodeURIComponent(document.URL) + '&description=' +  encodeURIComponent(document.title)); return false;"><img alt="Pin it" src="images/Pinterest.png" /></a></li>
+                                        <li><a href="http://www.reddit.com/submit?url=&title=" target="_blank" title="Submit to Reddit" onclick="window.open('http://www.reddit.com/submit?url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"><img alt="Submit to Reddit" src="images/Reddit.png" /></a></li>
+                                        <li><a href="http://www.linkedin.com/shareArticle?mini=true&url=&title=&summary=&source=" target="_blank" title="Share on LinkedIn" onclick="window.open('http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(document.URL) + '&title=' +  encodeURIComponent(document.title)); return false;"><img alt="Share on LinkedIn" src="images/LinkedIn.png" /></a></li>
+                                        <li><a href="mailto:?subject=&body=:%20" target="_blank" title="Send email" onclick="window.open('mailto:?subject=' + encodeURIComponent(document.title) + '&body=' +  encodeURIComponent(document.URL)); return false;"><img alt="Send email" src="images/Email.png" /></a></li>
+                                      </ul>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="pure-u-1">
+                        <h2 class="content-subhead"></h2>
+
+                        <!-- Images Section -->
+                        <div class="mimages">
+                            <div class="pure-g">
+
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg0" class="image">
+                                        <div id="desc0" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg1" class="image">
+                                        <div id="desc1" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg2" class="image">
+                                        <div id="desc2" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg3" class="image">
+                                        <div id="desc3" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg4" class="image">
+                                        <div id="desc4" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg5" class="image">
+                                        <div id="desc5" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg6" class="image">
+                                        <div id="desc6" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg7" class="image">
+                                        <div id="desc7" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg8" class="image">
+                                        <div id="desc8" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg9" class="image">
+                                        <div id="desc9" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg10" class="image">
+                                        <div id="desc10" class="imgDesc"></div>
+                                    </div>
+                                </div>
+                                <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4 accImg">
+                                    <div class="card">
+                                        <img src="" alt="" id="mimg11" class="image">
+                                        <div id="desc11" class="imgDesc"></div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+
+                        </div>
+
+                        <h2 class="content-subhead"></h2>
+
+                    </div>
+
+                </div> <!-- End details -->
+
+
+            </div>
+
+
+
+            <div class="footer secondary-color-block">
+                D Finlay for CSC7062 &COPY; 2021
+            </div>
+
+            <script src="purejs/ui.js"></script>
+
+
+</body>
+
+</html>
